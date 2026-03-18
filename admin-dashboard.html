@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Samir Abdelazim CMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Raleway:wght@300;400;500;600&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--black:#0A0A0A;--black-soft:#111;--black-mid:#1A1A1A;--black-card:#161616;--sw:270px;--white:#F5F0E8;--wd:rgba(245,240,232,.6);--gb:rgba(201,168,76,.18);--danger:#e05555;--success:#4caf88;--info:#5b9bd5;--fd:'Cormorant Garamond',serif;--fb:'Raleway',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0d0d0d;color:var(--white);font-family:var(--fb);display:flex;min-height:100vh;font-size:14px;}
+a{color:inherit;text-decoration:none;}
+input,select,textarea,button{font-family:var(--fb);}
+::-webkit-scrollbar{width:3px;height:3px;}::-webkit-scrollbar-track{background:#0a0a0a;}::-webkit-scrollbar-thumb{background:var(--gold);}
+
+/* SIDEBAR */
+#sb{width:var(--sw);flex-shrink:0;background:var(--black-soft);border-right:1px solid var(--gb);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto;transition:transform .3s;}
+.sb-brand{padding:24px 22px 20px;border-bottom:1px solid var(--gb);display:flex;align-items:center;gap:12px;}
+.sb-brand-crown{font-size:22px;color:var(--gold);}
+.sb-brand-text{}
+.sb-name{font-family:var(--fd);font-size:1.05rem;font-weight:400;line-height:1.2;}
+.sb-sub{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:block;margin-top:2px;}
+.sb-sect{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);padding:18px 22px 7px;font-weight:600;}
+.ni{display:flex;align-items:center;gap:11px;padding:10px 22px;cursor:pointer;color:var(--wd);transition:all .2s;font-size:11px;letter-spacing:.4px;border-left:2px solid transparent;}
+.ni:hover{background:rgba(201,168,76,.06);color:var(--white);}
+.ni.active{background:rgba(201,168,76,.1);color:var(--gold);border-left-color:var(--gold);}
+.ni svg{width:14px;height:14px;flex-shrink:0;}
+.sb-foot{margin-top:auto;padding:18px 22px;border-top:1px solid var(--gb);display:flex;flex-direction:column;gap:10px;}
+.sb-foot a{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--wd);transition:color .2s;letter-spacing:.5px;}
+.sb-foot a:hover{color:var(--gold);}
+.sb-foot svg{width:12px;height:12px;}
+
+/* MAIN */
+#main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+#topbar{background:var(--black-soft);border-bottom:1px solid var(--gb);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tb-title{font-family:var(--fd);font-size:1.3rem;font-weight:300;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.btn-preview{display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--gb);color:var(--wd);font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .2s;}
+.btn-preview:hover{border-color:var(--gold);color:var(--gold);}
+.btn-logout{display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(224,85,85,.1);border:1px solid rgba(224,85,85,.22);color:#e07070;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-logout:hover{background:rgba(224,85,85,.2);}
+#sbToggle{display:none;background:none;border:none;cursor:pointer;padding:6px;}
+#content{padding:28px;flex:1;}
+
+/* PANELS */
+.panel{display:none;}.panel.active{display:block;}
+.ph{margin-bottom:26px;}.ph h2{font-family:var(--fd);font-size:1.8rem;font-weight:300;}.ph p{font-size:12px;color:var(--wd);margin-top:4px;}
+
+/* CARDS */
+.card{background:var(--black-card);border:1px solid var(--gb);padding:24px;margin-bottom:20px;}
+.card-title{font-family:var(--fd);font-size:1.1rem;font-weight:400;color:var(--white);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--gb);display:flex;align-items:center;gap:9px;}
+.card-title svg{width:16px;height:16px;color:var(--gold);flex-shrink:0;}
+
+/* STATS */
+.sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:24px;}
+.sc{background:var(--black-card);border:1px solid var(--gb);padding:18px 20px;text-align:center;}
+.sc-n{font-family:var(--fd);font-size:2rem;font-weight:300;color:var(--gold);}
+.sc-l{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--wd);margin-top:4px;}
+
+/* FORMS */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.fgrp{margin-bottom:14px;}
+.fgrp.full{grid-column:1/-1;}
+.lbl{display:block;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;font-weight:500;}
+input[type=text],input[type=email],input[type=tel],input[type=url],input[type=password],input[type=number],select,textarea{width:100%;padding:10px 12px;background:#0d0d0d;border:1px solid var(--gb);color:var(--white);font-size:12px;outline:none;transition:border-color .2s;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);}
+input::placeholder,textarea::placeholder{color:rgba(245,240,232,.22);}
+select{cursor:pointer;}select option{background:#1a1a1a;}
+textarea{resize:vertical;min-height:80px;line-height:1.6;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:500;cursor:pointer;transition:all .2s;border:none;}
+.btn-p{background:var(--gold);color:var(--black);}.btn-p:hover{background:var(--gold-light);}
+.btn-s{background:transparent;border:1px solid var(--gb);color:var(--wd);}.btn-s:hover{border-color:var(--gold);color:var(--gold);}
+.btn-d{background:rgba(224,85,85,.12);border:1px solid rgba(224,85,85,.28);color:#e07070;}.btn-d:hover{background:rgba(224,85,85,.25);}
+.btn-sm{padding:5px 12px;font-size:9px;}
+.bti{padding:6px;border:1px solid var(--gb);background:transparent;color:var(--wd);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;}
+.bti:hover{border-color:var(--gold);color:var(--gold);}
+.bti.d:hover{border-color:#e07070;color:#e07070;}
+.bti svg{width:13px;height:13px;}
+
+/* TABLE */
+.dt{width:100%;border-collapse:collapse;}
+.dt th{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);padding:9px 12px;text-align:left;border-bottom:1px solid var(--gb);font-weight:500;}
+.dt td{padding:11px 12px;border-bottom:1px solid rgba(201,168,76,.06);font-size:12px;color:var(--wd);vertical-align:middle;}
+.dt tr:last-child td{border-bottom:none;}.dt tr:hover td{background:rgba(201,168,76,.025);}
+.dt td img{width:48px;height:48px;object-fit:cover;border:1px solid var(--gb);}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 8px;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;}
+.b-lux{background:rgba(201,168,76,.14);color:var(--gold);border:1px solid rgba(201,168,76,.28);}
+.b-mod{background:rgba(76,175,136,.1);color:#4caf88;border:1px solid rgba(76,175,136,.28);}
+.b-cls{background:rgba(120,120,200,.1);color:#9999dd;border:1px solid rgba(120,120,200,.28);}
+
+/* UPLOAD ZONE */
+.upz{border:1px dashed var(--gb);padding:24px;text-align:center;cursor:pointer;transition:border-color .3s;background:#0a0a0a;position:relative;}
+.upz:hover{border-color:var(--gold);}
+.upz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upz-icon{color:var(--gold);font-size:24px;margin-bottom:8px;}
+.upz-txt{font-size:11px;color:var(--wd);}
+.img-prev{max-width:180px;max-height:70px;object-fit:contain;margin-top:10px;display:none;border:1px solid var(--gb);}
+
+/* COLOR PICKERS */
+.cr{display:flex;align-items:center;gap:10px;}
+.cs{width:32px;height:32px;border:1px solid var(--gb);cursor:pointer;overflow:hidden;position:relative;}
+.cs input[type=color]{position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);opacity:0;cursor:pointer;}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:11px 22px;font-size:11px;letter-spacing:.8px;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateY(8px);max-width:300px;}
+#toast.show{opacity:1;transform:translateY(0);}
+#toast.ok{background:#1a2e22;border:1px solid var(--success);color:var(--success);}
+#toast.err{background:#2e1a1a;border:1px solid var(--danger);color:var(--danger);}
+
+/* TOGGLE */
+.tw{display:flex;align-items:center;gap:9px;}
+.tg{width:40px;height:20px;background:#2a2a2a;border-radius:10px;position:relative;cursor:pointer;transition:background .3s;border:none;flex-shrink:0;}
+.tg.on{background:var(--gold);}
+.tg::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:left .3s;}
+.tg.on::after{left:23px;}
+.tg-lbl{font-size:11px;color:var(--wd);}
+
+/* MEDIA GRID */
+.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:7px;}
+.mi{position:relative;aspect-ratio:1;background:#0a0a0a;border:1px solid var(--gb);cursor:pointer;overflow:hidden;}
+.mi img{width:100%;height:100%;object-fit:cover;transition:transform .3s;}
+.mi:hover img{transform:scale(1.05);}
+.mi-ov{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.mi:hover .mi-ov{opacity:1;}
+
+/* BEFORE/AFTER PREVIEW */
+.ba-preview{display:flex;gap:8px;align-items:center;}
+.ba-thumb{width:80px;height:55px;object-fit:cover;border:1px solid var(--gb);flex-shrink:0;}
+.ba-arrow{color:var(--gold);font-size:18px;}
+
+/* LANG TABS */
+.lang-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--gb);}
+.lang-tab{padding:8px 20px;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:var(--wd);border-bottom:2px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;}
+.lang-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* SEO PREVIEW */
+.seo-prev{background:#fff;padding:14px;max-width:480px;}
+.seo-title-p{color:#1a0dab;font-size:17px;font-family:Arial,sans-serif;}
+.seo-url-p{color:#006621;font-size:12px;font-family:Arial,sans-serif;margin:2px 0;}
+.seo-desc-p{color:#545454;font-size:12px;font-family:Arial,sans-serif;line-height:1.4;}
+
+/* MOBILE */
+@media(max-width:900px){#sb{transform:translateX(-100%);}#sb.open{transform:none;}#main{margin-left:0;}#sbToggle{display:block;}.fg,.fg3{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sb">
+  <div class="sb-brand">
+    <span class="sb-brand-crown">♛</span>
+    <div class="sb-brand-text">
+      <div class="sb-name">Samir Abdelazim</div>
+      <span class="sb-sub">CMS Dashboard</span>
+    </div>
+  </div>
+  <span class="sb-sect">Overview</span>
+  <div class="ni active" onclick="go('dashboard')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+  <span class="sb-sect">Website Content</span>
+  <div class="ni" onclick="go('branding')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Branding &amp; Theme</div>
+  <div class="ni" onclick="go('homepage')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Homepage / Hero</div>
+  <div class="ni" onclick="go('products')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Products</div>
+  <div class="ni" onclick="go('fabrics')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>Fabrics</div>
+  <div class="ni" onclick="go('gallery')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Gallery</div>
+  <div class="ni" onclick="go('projects')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Before / After Projects</div>
+  <div class="ni" onclick="go('testimonials')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Testimonials</div>
+  <span class="sb-sect">Settings</span>
+  <div class="ni" onclick="go('contact')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2A19.79 19.79 0 013.07 9.82"/></svg>Contact Settings</div>
+  <div class="ni" onclick="go('social')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/></svg>Social Media</div>
+  <div class="ni" onclick="go('theme')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="0.5" fill="currentColor"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor"/><circle cx="8.5" cy="7.5" r="0.5" fill="currentColor"/><circle cx="6.5" cy="12.5" r="0.5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>Theme Controls</div>
+  <div class="ni" onclick="go('media')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Media Library</div>
+  <div class="ni" onclick="go('seo')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>SEO Settings</div>
+  <div class="ni" onclick="go('users')"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a8.38 8.38 0 0113 0"/></svg>Users &amp; Settings</div>
+  <div class="sb-foot">
+    <a href="index.html" target="_blank"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>View Website</a>
+    <a href="#" onclick="logout()"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button id="sbToggle" onclick="document.getElementById('sb').classList.toggle('open')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="tb-title" id="tbTitle">Dashboard</span>
+    </div>
+    <div class="tb-right">
+      <button class="btn-preview" onclick="window.open('index.html','_blank')">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>Preview
+      </button>
+      <button class="btn-logout" onclick="logout()">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout
+      </button>
+    </div>
+  </div>
+  <div id="content">
+
+<!-- ===== DASHBOARD ===== -->
+<div class="panel active" id="p-dashboard">
+  <div class="ph"><h2>Welcome Back, Admin ♛</h2><p>Manage every element of your showroom website from here.</p></div>
+  <div class="sr" id="dashStats"></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Quick Actions</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <button class="btn btn-p btn-sm" onclick="go('products')">+ Add Product</button>
+      <button class="btn btn-s btn-sm" onclick="go('gallery')">+ Upload Gallery</button>
+      <button class="btn btn-s btn-sm" onclick="go('projects')">+ Before/After</button>
+      <button class="btn btn-s btn-sm" onclick="go('homepage')">Edit Hero</button>
+      <button class="btn btn-s btn-sm" onclick="go('testimonials')">Add Review</button>
+      <button class="btn btn-s btn-sm" onclick="go('contact')">Update Contact</button>
+    </div>
+  </div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>Recent Products</div>
+    <table class="dt" id="dashProducts"></table>
+  </div>
+</div>
+
+<!-- ===== BRANDING ===== -->
+<div class="panel" id="p-branding">
+  <div class="ph"><h2>Branding &amp; Identity</h2><p>Edit site name, tagline, logo, and favicon.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>Site Identity</div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">Site Name</label><input type="text" id="b_name" placeholder="Samir Abdelazim Curtains & Furnishings"></div>
+      <div class="fgrp"><label class="lbl">Tagline</label><input type="text" id="b_tag" placeholder="Curtains & Furnishings"></div>
+      <div class="fgrp"><label class="lbl">Established Line</label><input type="text" id="b_est" placeholder="Established — Cairo, Egypt"></div>
+      <div class="fgrp"><label class="lbl">Footer Description</label><input type="text" id="b_fdesc" placeholder="Short brand description..."></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>Logo &amp; Favicon</div>
+    <div class="fg">
+      <div><label class="lbl">Logo Image</label>
+        <div class="upz"><input type="file" id="b_logo" accept="image/*" onchange="prevImg(this,'b_logoPrev')"><div class="upz-icon">♛</div><div class="upz-txt">Upload logo image</div></div>
+        <img id="b_logoPrev" class="img-prev">
+      </div>
+      <div><label class="lbl">Favicon (.ico or .png)</label>
+        <div class="upz"><input type="file" id="b_fav" accept="image/*" onchange="prevImg(this,'b_favPrev')"><div class="upz-icon" style="font-size:18px;">🔖</div><div class="upz-txt">Upload favicon (32×32 px)</div></div>
+        <img id="b_favPrev" class="img-prev" style="width:32px;height:32px;">
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-p" onclick="saveBranding()">Save Branding</button>
+</div>
+
+<!-- ===== HOMEPAGE ===== -->
+<div class="panel" id="p-homepage">
+  <div class="ph"><h2>Homepage / Hero</h2><p>Edit hero text, slides, and animation settings.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Hero Text (Bilingual)</div>
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="switchLangTab(this,'en')">English</button>
+      <button class="lang-tab" onclick="switchLangTab(this,'ar')">العربية</button>
+    </div>
+    <div id="hp-en">
+      <div class="fgrp"><label class="lbl">Hero Title (EN)</label><input type="text" id="h_title_en" placeholder="Luxury Curtains & Furnishings That Transform Your Home"></div>
+      <div class="fgrp"><label class="lbl">Hero Subtitle (EN)</label><textarea id="h_sub_en" placeholder="Masterfully crafted..."></textarea></div>
+      <div class="fg">
+        <div class="fgrp"><label class="lbl">Button 1 Text (EN)</label><input type="text" id="h_b1t_en" placeholder="View Collection"></div>
+        <div class="fgrp"><label class="lbl">Button 2 Text (EN)</label><input type="text" id="h_b2t_en" placeholder="Contact on WhatsApp"></div>
+      </div>
+    </div>
+    <div id="hp-ar" style="display:none;">
+      <div class="fgrp"><label class="lbl">Hero Title (AR)</label><input type="text" id="h_title_ar" placeholder="ستائر وتجهيزات منزلية فاخرة" dir="rtl"></div>
+      <div class="fgrp"><label class="lbl">Hero Subtitle (AR)</label><textarea id="h_sub_ar" placeholder="مصنوعة بعناية..." dir="rtl"></textarea></div>
+      <div class="fg">
+        <div class="fgrp"><label class="lbl">Button 1 Text (AR)</label><input type="text" id="h_b1t_ar" placeholder="استعرض المجموعة" dir="rtl"></div>
+        <div class="fgrp"><label class="lbl">Button 2 Text (AR)</label><input type="text" id="h_b2t_ar" placeholder="تواصل عبر واتساب" dir="rtl"></div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">Button 1 Link</label><input type="text" id="h_b1l" placeholder="#collection"></div>
+      <div class="fgrp"><label class="lbl">Button 2 Link (WhatsApp URL)</label><input type="text" id="h_b2l" placeholder="https://wa.me/201000000000"></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Hero Slides</div>
+    <div id="heroSlideList"></div>
+    <div style="margin-top:12px;"><label class="lbl">Add Slide (Image URL)</label>
+      <div style="display:flex;gap:7px;"><input type="text" id="newSlide" placeholder="https://images.unsplash.com/..."><button class="btn btn-p btn-sm" onclick="addSlide()">Add</button></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Animations</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="tw"><button class="tg on" id="t_heroAnim" onclick="this.classList.toggle('on')"></button><span class="tg-lbl">Hero entrance animations</span></div>
+      <div class="tw"><button class="tg on" id="t_scrollAnim" onclick="this.classList.toggle('on')"></button><span class="tg-lbl">Scroll reveal animations</span></div>
+      <div class="tw"><button class="tg on" id="t_curtain" onclick="this.classList.toggle('on')"></button><span class="tg-lbl">Theater curtain animation</span></div>
+      <div class="tw"><button class="tg on" id="t_marquee" onclick="this.classList.toggle('on')"></button><span class="tg-lbl">Marquee ticker strip</span></div>
+      <div class="tw"><button class="tg on" id="t_floatwa" onclick="this.classList.toggle('on')"></button><span class="tg-lbl">Floating WhatsApp button</span></div>
+    </div>
+  </div>
+  <button class="btn btn-p" onclick="saveHomepage()">Save Homepage</button>
+</div>
+
+<!-- ===== PRODUCTS ===== -->
+<div class="panel" id="p-products">
+  <div class="ph"><h2>Products Manager</h2><p>Add, edit, reorder, and delete curtain products.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add / Edit Product</div>
+    <div class="lang-tabs"><button class="lang-tab active" onclick="switchLangTab(this,'pen')">English</button><button class="lang-tab" onclick="switchLangTab(this,'par')">العربية</button></div>
+    <div id="p-en">
+      <div class="fg">
+        <div class="fgrp"><label class="lbl">Product Name (EN)</label><input type="text" id="p_name"></div>
+        <div class="fgrp"><label class="lbl">Category</label><select id="p_cat"><option value="luxury">Luxury</option><option value="modern">Modern</option><option value="classic">Classic</option></select></div>
+        <div class="fgrp"><label class="lbl">Price (EN)</label><input type="text" id="p_price" placeholder="From 3,500 EGP"></div>
+        <div class="fgrp"><label class="lbl">Image URL</label><input type="text" id="p_img" placeholder="https://..."></div>
+        <div class="fgrp full"><label class="lbl">Description (EN)</label><textarea id="p_desc"></textarea></div>
+      </div>
+    </div>
+    <div id="p-ar" style="display:none;">
+      <div class="fg">
+        <div class="fgrp"><label class="lbl">Product Name (AR)</label><input type="text" id="p_nameAr" dir="rtl"></div>
+        <div class="fgrp"><label class="lbl">Price (AR)</label><input type="text" id="p_priceAr" placeholder="من 3,500 جنيه" dir="rtl"></div>
+        <div class="fgrp full"><label class="lbl">Description (AR)</label><textarea id="p_descAr" dir="rtl"></textarea></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;">
+      <button class="btn btn-p" id="pAddBtn" onclick="saveProduct()">Add Product</button>
+      <button class="btn btn-s btn-sm" id="pCancelBtn" onclick="cancelProd()" style="display:none;">Cancel Edit</button>
+    </div>
+  </div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>All Products</div>
+    <table class="dt"><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead><tbody id="prodTable"></tbody></table>
+  </div>
+</div>
+
+<!-- ===== FABRICS ===== -->
+<div class="panel" id="p-fabrics">
+  <div class="ph"><h2>Fabrics Manager</h2><p>Manage fabric types displayed on the website.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Fabric</div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">Fabric Name (EN)</label><input type="text" id="f_name"></div>
+      <div class="fgrp"><label class="lbl">Fabric Name (AR)</label><input type="text" id="f_nameAr" dir="rtl"></div>
+      <div class="fgrp"><label class="lbl">Description (EN)</label><input type="text" id="f_desc"></div>
+      <div class="fgrp"><label class="lbl">Description (AR)</label><input type="text" id="f_descAr" dir="rtl"></div>
+      <div class="fgrp full"><label class="lbl">Image URL</label><input type="text" id="f_img" placeholder="https://..."></div>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="addFabric()">Add Fabric</button>
+  </div>
+  <div class="card"><div class="card-title">All Fabrics</div>
+    <table class="dt"><thead><tr><th>Image</th><th>Name (EN)</th><th>Name (AR)</th><th>Description</th><th>Actions</th></tr></thead><tbody id="fabTable"></tbody></table>
+  </div>
+</div>
+
+<!-- ===== GALLERY ===== -->
+<div class="panel" id="p-gallery">
+  <div class="ph"><h2>Gallery Manager</h2><p>Upload and manage portfolio images.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Image</div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">Image URL</label><input type="text" id="g_url" placeholder="https://images.unsplash.com/..."></div>
+      <div class="fgrp"><label class="lbl">Caption (optional)</label><input type="text" id="g_cap" placeholder="Beautiful living room..."></div>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="addGallery()">Add Image</button>
+  </div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>Gallery Images</div>
+    <div class="mg" id="galGrid"></div>
+  </div>
+</div>
+
+<!-- ===== PROJECTS (BEFORE/AFTER) ===== -->
+<div class="panel" id="p-projects">
+  <div class="ph"><h2>Before / After Projects</h2><p>Showcase room transformation projects.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>Add Project</div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">Before Image URL</label><input type="text" id="ba_before" placeholder="https://..."></div>
+      <div class="fgrp"><label class="lbl">After Image URL</label><input type="text" id="ba_after" placeholder="https://..."></div>
+      <div class="fgrp"><label class="lbl">Description (EN)</label><input type="text" id="ba_desc" placeholder="Living Room Transformation"></div>
+      <div class="fgrp"><label class="lbl">Description (AR)</label><input type="text" id="ba_descAr" placeholder="تحويل غرفة المعيشة" dir="rtl"></div>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="addProject()">Add Project</button>
+  </div>
+  <div class="card"><div class="card-title">All Projects</div>
+    <table class="dt"><thead><tr><th>Before</th><th>After</th><th>Description</th><th>Actions</th></tr></thead><tbody id="projTable"></tbody></table>
+  </div>
+</div>
+
+<!-- ===== TESTIMONIALS ===== -->
+<div class="panel" id="p-testimonials">
+  <div class="ph"><h2>Testimonials</h2><p>Manage customer reviews and ratings.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Add Review</div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">Customer Name (EN)</label><input type="text" id="t_name"></div>
+      <div class="fgrp"><label class="lbl">Customer Name (AR)</label><input type="text" id="t_nameAr" dir="rtl"></div>
+      <div class="fgrp"><label class="lbl">Location (EN)</label><input type="text" id="t_loc" placeholder="Cairo, Egypt"></div>
+      <div class="fgrp"><label class="lbl">Location (AR)</label><input type="text" id="t_locAr" placeholder="القاهرة، مصر" dir="rtl"></div>
+      <div class="fgrp"><label class="lbl">Rating (1–5)</label><select id="t_rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+      <div class="fgrp"><label class="lbl">Photo URL (optional)</label><input type="text" id="t_photo" placeholder="https://..."></div>
+      <div class="fgrp full"><label class="lbl">Review (EN)</label><textarea id="t_review"></textarea></div>
+      <div class="fgrp full"><label class="lbl">Review (AR)</label><textarea id="t_reviewAr" dir="rtl"></textarea></div>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="addTestimonial()">Add Review</button>
+  </div>
+  <div class="card"><div class="card-title">All Reviews</div><div id="testiList"></div></div>
+</div>
+
+<!-- ===== CONTACT ===== -->
+<div class="panel" id="p-contact">
+  <div class="ph"><h2>Contact Settings</h2><p>Update all contact information displayed on the site.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2"/></svg>Contact Details</div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">Phone 1</label><input type="tel" id="c_p1"></div>
+      <div class="fgrp"><label class="lbl">Phone 2</label><input type="tel" id="c_p2"></div>
+      <div class="fgrp"><label class="lbl">WhatsApp URL</label><input type="url" id="c_wa"></div>
+      <div class="fgrp"><label class="lbl">Email</label><input type="email" id="c_em"></div>
+      <div class="fgrp full"><label class="lbl">Address</label><input type="text" id="c_addr"></div>
+      <div class="fgrp"><label class="lbl">Opening Hours</label><input type="text" id="c_hrs"></div>
+      <div class="fgrp full"><label class="lbl">Google Maps Embed URL (iframe src)</label><input type="text" id="c_map"></div>
+    </div>
+  </div>
+  <button class="btn btn-p" onclick="saveContact()">Save Contact</button>
+</div>
+
+<!-- ===== SOCIAL ===== -->
+<div class="panel" id="p-social">
+  <div class="ph"><h2>Social Media Links</h2><p>Update your social profile URLs.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/></svg>Social Profiles</div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">Facebook</label><input type="url" id="s_fb" placeholder="https://facebook.com/..."></div>
+      <div class="fgrp"><label class="lbl">Instagram</label><input type="url" id="s_ig" placeholder="https://instagram.com/..."></div>
+      <div class="fgrp"><label class="lbl">WhatsApp</label><input type="url" id="s_wa" placeholder="https://wa.me/..."></div>
+      <div class="fgrp"><label class="lbl">TikTok</label><input type="url" id="s_tk" placeholder="https://tiktok.com/..."></div>
+      <div class="fgrp"><label class="lbl">YouTube</label><input type="url" id="s_yt" placeholder="https://youtube.com/..."></div>
+      <div class="fgrp"><label class="lbl">Pinterest</label><input type="url" id="s_pt" placeholder="https://pinterest.com/..."></div>
+    </div>
+  </div>
+  <button class="btn btn-p" onclick="saveSocial()">Save Social Links</button>
+</div>
+
+<!-- ===== THEME ===== -->
+<div class="panel" id="p-theme">
+  <div class="ph"><h2>Theme Controls</h2><p>Customize colors and typography.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>Color Palette</div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">Primary Gold Color</label>
+        <div class="cr"><div class="cs" id="sw_gold"><input type="color" id="th_gold" value="#C9A84C" oninput="syncSwatch('gold')"></div><input type="text" id="th_goldH" value="#C9A84C" style="width:110px;" oninput="syncColor('gold')"></div>
+      </div>
+      <div class="fgrp"><label class="lbl">Background Black</label>
+        <div class="cr"><div class="cs" id="sw_black"><input type="color" id="th_black" value="#0A0A0A" oninput="syncSwatch('black')"></div><input type="text" id="th_blackH" value="#0A0A0A" style="width:110px;" oninput="syncColor('black')"></div>
+      </div>
+    </div>
+    <div class="fgrp" style="margin-top:8px;"><label class="lbl">Preset Themes</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-s btn-sm" onclick="applyPreset('#C9A84C','#0A0A0A')">Gold &amp; Black (Default)</button>
+        <button class="btn btn-s btn-sm" onclick="applyPreset('#B8860B','#0D0D0D')">Dark Gold</button>
+        <button class="btn btn-s btn-sm" onclick="applyPreset('#E8C97A','#0A0A0A')">Light Gold</button>
+        <button class="btn btn-s btn-sm" onclick="applyPreset('#C0A060','#0F0C06')">Warm Bronze</button>
+        <button class="btn btn-s btn-sm" onclick="applyPreset('#A8C5DA','#0A0A0A')">Silver Blue</button>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>Typography</div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">Display Font</label>
+        <select id="th_dispFont">
+          <option value="'Cormorant Garamond', serif">Cormorant Garamond (Default)</option>
+          <option value="'Playfair Display', serif">Playfair Display</option>
+          <option value="'Libre Baskerville', serif">Libre Baskerville</option>
+          <option value="'Josefin Sans', sans-serif">Josefin Sans</option>
+        </select>
+      </div>
+      <div class="fgrp"><label class="lbl">Body Font</label>
+        <select id="th_bodyFont">
+          <option value="'Raleway', sans-serif">Raleway (Default)</option>
+          <option value="'Montserrat', sans-serif">Montserrat</option>
+          <option value="'Lato', sans-serif">Lato</option>
+          <option value="'Poppins', sans-serif">Poppins</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-p" onclick="saveTheme()">Save Theme</button>
+</div>
+
+<!-- ===== MEDIA ===== -->
+<div class="panel" id="p-media">
+  <div class="ph"><h2>Media Library</h2><p>Upload and manage all images in one place.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>Upload</div>
+    <div class="upz"><input type="file" id="med_upload" accept="image/*" multiple onchange="uploadMedia(this)"><div class="upz-icon" style="font-size:28px;">↑</div><div class="upz-txt">Click or drag to upload multiple images</div></div>
+    <div style="margin-top:12px;"><label class="lbl">Or Add by URL</label>
+      <div style="display:flex;gap:7px;"><input type="text" id="med_url" placeholder="https://..."><button class="btn btn-s btn-sm" onclick="addMediaUrl()">Add URL</button></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title" style="justify-content:space-between;"><span style="display:flex;align-items:center;gap:9px;"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>All Media</span><span style="font-size:10px;color:var(--wd);" id="medCount">0 images</span></div>
+    <div class="mg" id="medGrid"></div>
+  </div>
+</div>
+
+<!-- ===== SEO ===== -->
+<div class="panel" id="p-seo">
+  <div class="ph"><h2>SEO Settings</h2><p>Optimize your website for search engines.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Meta Tags</div>
+    <div class="fgrp"><label class="lbl">Page Title</label><input type="text" id="seo_title" placeholder="Samir Abdelazim — Luxury Curtains Cairo" oninput="seoPreview()"></div>
+    <div class="fgrp"><label class="lbl">Meta Description</label><textarea id="seo_desc" placeholder="Premium custom curtains..." oninput="seoPreview()"></textarea></div>
+    <div class="fgrp"><label class="lbl">Keywords</label><input type="text" id="seo_kw" placeholder="curtains cairo, luxury curtains egypt..."></div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">OG Social Share Image URL</label><input type="text" id="seo_og"></div>
+      <div class="fgrp"><label class="lbl">Google Analytics ID</label><input type="text" id="seo_ga" placeholder="G-XXXXXXXXXX"></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title">Google Preview</div>
+    <div class="seo-prev"><div class="seo-title-p" id="seoTp">Page Title</div><div class="seo-url-p">www.samirabdelazim.com</div><div class="seo-desc-p" id="seoDp">Meta description...</div></div>
+  </div>
+  <button class="btn btn-p" onclick="saveSEO()">Save SEO</button>
+</div>
+
+<!-- ===== USERS ===== -->
+<div class="panel" id="p-users">
+  <div class="ph"><h2>Users &amp; Settings</h2><p>Manage admin credentials and data.</p></div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Change Credentials</div>
+    <div class="fg">
+      <div class="fgrp"><label class="lbl">New Username</label><input type="text" id="u_name" placeholder="admin"></div>
+      <div class="fgrp"><label class="lbl">Current Password (verify)</label><input type="password" id="u_cur"></div>
+      <div class="fgrp"><label class="lbl">New Password</label><input type="password" id="u_new"></div>
+      <div class="fgrp"><label class="lbl">Confirm New Password</label><input type="password" id="u_conf"></div>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="saveCredentials()">Update Credentials</button>
+  </div>
+  <div class="card"><div class="card-title"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Data Management</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-s btn-sm" onclick="exportData()">Export All Data (.json)</button>
+      <button class="btn btn-s btn-sm" onclick="document.getElementById('impInput').click()">Import Data</button>
+      <button class="btn btn-d btn-sm" onclick="if(confirm('Reset ALL data to defaults?'))resetAll()">Reset to Defaults</button>
+    </div>
+    <input type="file" id="impInput" accept=".json" style="display:none" onchange="importData(this)">
+  </div>
+</div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+<div id="toast"></div>
+
+<script>
+/* ===== AUTH ===== */
+if(sessionStorage.getItem('sa_admin_auth')!=='true') location.href='admin-login.html';
+function logout(){sessionStorage.removeItem('sa_admin_auth');location.href='admin-login.html';}
+
+/* ===== STORAGE ===== */
+function get(k,fb){try{const v=localStorage.getItem('sa_'+k);return v?JSON.parse(v):fb;}catch{return fb;}}
+function set(k,v){localStorage.setItem('sa_'+k,JSON.stringify(v));}
+
+/* ===== DEFAULT DATA ===== */
+const D_PROD=[
+  {id:1,name:'Velvet Imperial',nameAr:'مخمل إمبراطوري',category:'luxury',img:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80',price:'From 3,500 EGP',priceAr:'من 3,500 جنيه',desc:'Rich velvet with imperial finish.',descAr:'مخمل فاخر بلمسة إمبراطورية.'},
+  {id:2,name:'Nordic Linen',nameAr:'كتان نوردي',category:'modern',img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',price:'From 1,800 EGP',priceAr:'من 1,800 جنيه',desc:'Clean Scandinavian linen.',descAr:'كتان إسكندنافي نظيف.'},
+  {id:3,name:'Golden Palace',nameAr:'القصر الذهبي',category:'classic',img:'https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?w=600&q=80',price:'From 4,200 EGP',priceAr:'من 4,200 جنيه',desc:'Classic gold-toned drapes.',descAr:'ستائر ذهبية كلاسيكية.'},
+  {id:4,name:'Silk Cascade',nameAr:'شلال الحرير',category:'luxury',img:'https://images.unsplash.com/photo-1567016432779-094069958ea5?w=600&q=80',price:'From 5,000 EGP',priceAr:'من 5,000 جنيه',desc:'Pure silk cascading panels.',descAr:'ألواح حرير خالص.'},
+  {id:5,name:'Monochrome Edge',nameAr:'الحافة أحادية اللون',category:'modern',img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80',price:'From 2,200 EGP',priceAr:'من 2,200 جنيه',desc:'Bold modern monochrome.',descAr:'تصميم أحادي اللون.'},
+  {id:6,name:'Ottoman Heritage',nameAr:'التراث العثماني',category:'classic',img:'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=80',price:'From 3,800 EGP',priceAr:'من 3,800 جنيه',desc:'Traditional Ottoman patterns.',descAr:'أنماط عثمانية تقليدية.'},
+];
+const D_FAB=[
+  {name:'Silk',nameAr:'حرير',desc:'Lustrous & smooth',descAr:'لامع وناعم',img:'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=500&q=80'},
+  {name:'Velvet',nameAr:'مخمل',desc:'Rich & plush',descAr:'غني وفاخر',img:'https://images.unsplash.com/photo-1616627547584-bf28cee262db?w=500&q=80'},
+  {name:'Linen',nameAr:'كتان',desc:'Light & natural',descAr:'خفيف وطبيعي',img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80'},
+  {name:'Jacquard',nameAr:'جاكار',desc:'Woven & textured',descAr:'منسوج ومحبوك',img:'https://images.unsplash.com/photo-1567016432779-094069958ea5?w=500&q=80'},
+];
+const D_GAL=[
+  {url:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=700&q=80',caption:''},
+  {url:'https://images.unsplash.com/photo-1600210491892-03d54a95e671?w=700&q=80',caption:''},
+  {url:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=700&q=80',caption:''},
+  {url:'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=700&q=80',caption:''},
+  {url:'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=700&q=80',caption:''},
+  {url:'https://images.unsplash.com/photo-1567016432779-094069958ea5?w=700&q=80',caption:''},
+];
+const D_BA=[
+  {before:'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80',after:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80',desc:'Living Room Transformation',descAr:'تحويل غرفة المعيشة'},
+  {before:'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80',after:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80',desc:'Master Bedroom Upgrade',descAr:'تطوير غرفة النوم'},
+];
+const D_TEST=[
+  {name:'Ahmed Hassan',nameAr:'أحمد حسن',loc:'Cairo',locAr:'القاهرة',rating:5,review:'Stunning quality. Completely transformed our home.',reviewAr:'جودة رائعة. حولت منزلنا بالكامل.',photo:''},
+  {name:'Fatima Khalid',nameAr:'فاطمة خالد',loc:'Alexandria',locAr:'الإسكندرية',rating:5,review:'Professional team and beautiful materials.',reviewAr:'فريق محترف ومواد جميلة.',photo:''},
+];
+
+/* ===== PANEL NAVIGATION ===== */
+const TITLES={dashboard:'Dashboard',branding:'Branding & Identity',homepage:'Homepage / Hero',products:'Products Manager',fabrics:'Fabrics Manager',gallery:'Gallery Manager',projects:'Before / After Projects',testimonials:'Testimonials',contact:'Contact Settings',social:'Social Media',theme:'Theme Controls',media:'Media Library',seo:'SEO Settings',users:'Users & Settings'};
+function go(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  const panel = document.getElementById('p-'+name);
+  if(panel) panel.classList.add('active');
+  document.querySelectorAll('.ni').forEach(n=>{if(n.getAttribute('onclick')?.includes("'"+name+"'"))n.classList.add('active');});
+  document.getElementById('tbTitle').textContent=TITLES[name]||name;
+  document.getElementById('sb').classList.remove('open');
+  const loaders={dashboard:renderDash,products:renderProd,fabrics:renderFab,gallery:renderGal,projects:renderProj,testimonials:renderTesti,media:renderMedia,homepage:loadHP,branding:loadBrand,contact:loadContact,social:loadSocial,theme:loadTheme,seo:loadSEO};
+  if(loaders[name]) loaders[name]();
+}
+
+/* ===== TOAST ===== */
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',2800);}
+
+/* ===== LANG TABS ===== */
+function switchLangTab(el,lang){
+  const parent=el.closest('.card');
+  parent.querySelectorAll('.lang-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(lang==='en'||lang==='pen'){const a=parent.querySelector('#hp-en')||parent.querySelector('#p-en');const b=parent.querySelector('#hp-ar')||parent.querySelector('#p-ar');if(a)a.style.display='';if(b)b.style.display='none';}
+  else{const a=parent.querySelector('#hp-en')||parent.querySelector('#p-en');const b=parent.querySelector('#hp-ar')||parent.querySelector('#p-ar');if(a)a.style.display='none';if(b)b.style.display='';}
+}
+
+/* ===== DASHBOARD ===== */
+function renderDash(){
+  const prods=get('products',D_PROD);const gal=get('gallery',D_GAL);const fab=get('fabrics',D_FAB);const test=get('testimonials',D_TEST);const med=get('media',[]);const ba=get('beforeAfter',D_BA);
+  document.getElementById('dashStats').innerHTML=`
+    <div class="sc"><div class="sc-n">${prods.length}</div><div class="sc-l">Products</div></div>
+    <div class="sc"><div class="sc-n">${gal.length}</div><div class="sc-l">Gallery Images</div></div>
+    <div class="sc"><div class="sc-n">${fab.length}</div><div class="sc-l">Fabrics</div></div>
+    <div class="sc"><div class="sc-n">${ba.length}</div><div class="sc-l">BA Projects</div></div>
+    <div class="sc"><div class="sc-n">${test.length}</div><div class="sc-l">Testimonials</div></div>
+    <div class="sc"><div class="sc-n">${med.length}</div><div class="sc-l">Media Files</div></div>`;
+  document.getElementById('dashProducts').innerHTML=`
+    <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th></tr></thead>
+    <tbody>${prods.slice(0,5).map(p=>`<tr><td><img src="${p.img}" alt="${p.name}"></td><td style="color:var(--white)">${p.name}</td><td><span class="badge b-${p.category.slice(0,3)}">${p.category}</span></td><td>${p.price||'—'}</td></tr>`).join('')}</tbody>`;
+}
+
+/* ===== BRANDING ===== */
+function loadBrand(){const d=get('branding',{});
+  ['name','tag','est','fdesc'].forEach(k=>{const el=document.getElementById('b_'+k);if(el)el.value=d[k]||'';});
+  if(d.logoUrl){const p=document.getElementById('b_logoPrev');p.src=d.logoUrl;p.style.display='block';}
+}
+function saveBranding(){
+  const d={name:v('b_name'),tag:v('b_tag'),est:v('b_est'),fdesc:v('b_fdesc'),
+    colorGold:document.getElementById('th_gold')?.value||get('theme',{}).colorGold||'#C9A84C',
+    colorBlack:document.getElementById('th_black')?.value||get('theme',{}).colorBlack||'#0A0A0A',
+    logoUrl:get('branding',{}).logoUrl||'',faviconUrl:get('branding',{}).faviconUrl||''};
+  set('branding',d);toast('Branding saved! Reload website to see changes.');
+}
+
+/* ===== HOMEPAGE ===== */
+function loadHP(){const d=get('homepage',{});
+  ['h_title_en','h_sub_en','h_b1t_en','h_b2t_en','h_title_ar','h_sub_ar','h_b1t_ar','h_b2t_ar','h_b1l','h_b2l'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value=d[id.replace('h_','')]||'';
+  });
+  const a=d.animations||{};
+  ['heroAnim','scrollAnim','curtain','marquee','floatwa'].forEach(k=>{
+    const el=document.getElementById('t_'+k);if(el){el.className='tg'+(a[k]!==false?' on':'');}
+  });
+  renderSlides();
+}
+function renderSlides(){
+  const slides=get('homepage',{}).heroSlides||['https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=1600&q=80'];
+  document.getElementById('heroSlideList').innerHTML=slides.map((url,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;background:#0d0d0d;border:1px solid var(--gb);padding:10px 14px;margin-bottom:6px;">
+      <img src="${url}" style="width:80px;height:50px;object-fit:cover;border:1px solid var(--gb);">
+      <div style="flex:1;font-size:11px;color:var(--wd);word-break:break-all;">${url}</div>
+      <button class="bti d" onclick="removeSlide(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+    </div>`).join('');
+}
+function addSlide(){
+  const url=v('newSlide');if(!url)return toast('Enter image URL','err');
+  const d=get('homepage',{});d.heroSlides=d.heroSlides||[];d.heroSlides.push(url);
+  set('homepage',d);document.getElementById('newSlide').value='';renderSlides();toast('Slide added!');
+}
+function removeSlide(i){const d=get('homepage',{});d.heroSlides.splice(i,1);set('homepage',d);renderSlides();toast('Slide removed');}
+function saveHomepage(){
+  const d=get('homepage',{});
+  d.title_en=v('h_title_en');d.sub_en=v('h_sub_en');d.b1t_en=v('h_b1t_en');d.b2t_en=v('h_b2t_en');
+  d.title_ar=v('h_title_ar');d.sub_ar=v('h_sub_ar');d.b1t_ar=v('h_b1t_ar');d.b2t_ar=v('h_b2t_ar');
+  d.b1l=v('h_b1l');d.b2l=v('h_b2l');
+  d.animations={heroAnim:on('t_heroAnim'),scrollAnim:on('t_scrollAnim'),curtain:on('t_curtain'),marquee:on('t_marquee'),floatwa:on('t_floatwa')};
+  set('homepage',d);toast('Homepage saved!');
+}
+
+/* ===== PRODUCTS ===== */
+let editProdId=null;
+function renderProd(){
+  const prods=get('products',D_PROD);
+  document.getElementById('prodTable').innerHTML=prods.map(p=>`
+    <tr>
+      <td><img src="${p.img}" alt="${p.name}"></td>
+      <td style="color:var(--white);">${p.name}<br><small style="color:var(--wd);font-size:10px;">${p.nameAr||''}</small></td>
+      <td><span class="badge b-${p.category.slice(0,3)}">${p.category}</span></td>
+      <td>${p.price||'—'}</td>
+      <td><div style="display:flex;gap:5px;">
+        <button class="bti" onclick="editProd(${p.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="bti d" onclick="delProd(${p.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+      </div></td>
+    </tr>`).join('');
+}
+function saveProduct(){
+  const name=v('p_name');if(!name)return toast('Name required','err');
+  const prods=get('products',D_PROD);
+  const obj={name,nameAr:v('p_nameAr'),category:v('p_cat')||'luxury',price:v('p_price'),priceAr:v('p_priceAr'),img:v('p_img'),desc:v('p_desc'),descAr:v('p_descAr')};
+  if(editProdId!==null){const i=prods.findIndex(x=>x.id===editProdId);if(i>-1)prods[i]={...prods[i],...obj};editProdId=null;document.getElementById('pAddBtn').textContent='Add Product';document.getElementById('pCancelBtn').style.display='none';toast('Product updated!');}
+  else{obj.id=Date.now();prods.push(obj);toast('Product added!');}
+  set('products',prods);['p_name','p_nameAr','p_price','p_priceAr','p_img','p_desc','p_descAr'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderProd();
+}
+function editProd(id){
+  const p=get('products',D_PROD).find(x=>x.id===id);if(!p)return;
+  ['name','nameAr','price','priceAr','img','desc','descAr'].forEach(k=>{const el=document.getElementById('p_'+k);if(el)el.value=p[k]||'';});
+  const cat=document.getElementById('p_cat');if(cat)cat.value=p.category||'luxury';
+  editProdId=id;document.getElementById('pAddBtn').textContent='Update Product';document.getElementById('pCancelBtn').style.display='inline-flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelProd(){editProdId=null;document.getElementById('pAddBtn').textContent='Add Product';document.getElementById('pCancelBtn').style.display='none';['p_name','p_nameAr','p_price','p_priceAr','p_img','p_desc','p_descAr'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function delProd(id){if(!confirm('Delete this product?'))return;set('products',get('products',D_PROD).filter(p=>p.id!==id));renderProd();toast('Deleted');}
+
+/* ===== FABRICS ===== */
+function renderFab(){
+  const fabs=get('fabrics',D_FAB);
+  document.getElementById('fabTable').innerHTML=fabs.map((f,i)=>`
+    <tr><td><img src="${f.img}" alt="${f.name}"></td><td style="color:var(--white);">${f.name}</td><td>${f.nameAr||''}</td><td>${f.desc}</td>
+    <td><button class="bti d" onclick="delFab(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></td></tr>`).join('');
+}
+function addFabric(){
+  const name=v('f_name');if(!name)return toast('Name required','err');
+  const fabs=get('fabrics',D_FAB);
+  fabs.push({name,nameAr:v('f_nameAr'),desc:v('f_desc'),descAr:v('f_descAr'),img:v('f_img')});
+  set('fabrics',fabs);['f_name','f_nameAr','f_desc','f_descAr','f_img'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderFab();toast('Fabric added!');
+}
+function delFab(i){if(!confirm('Delete?'))return;const fabs=get('fabrics',D_FAB);fabs.splice(i,1);set('fabrics',fabs);renderFab();toast('Deleted');}
+
+/* ===== GALLERY ===== */
+function renderGal(){
+  const items=get('gallery',D_GAL);
+  document.getElementById('galGrid').innerHTML=items.map((item,i)=>`
+    <div class="mi"><img src="${item.url}" alt="" loading="lazy">
+      <div class="mi-ov">
+        <button class="bti d" onclick="delGal(${i})" style="border-color:rgba(255,255,255,.3);color:#fff;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+    </div>`).join('');
+}
+function addGallery(){
+  const url=v('g_url');if(!url)return toast('URL required','err');
+  const items=get('gallery',D_GAL);items.push({url,caption:v('g_cap')});
+  set('gallery',items);document.getElementById('g_url').value='';document.getElementById('g_cap').value='';
+  renderGal();toast('Image added!');
+}
+function delGal(i){if(!confirm('Remove?'))return;const items=get('gallery',D_GAL);items.splice(i,1);set('gallery',items);renderGal();toast('Removed');}
+
+/* ===== PROJECTS ===== */
+function renderProj(){
+  const items=get('beforeAfter',D_BA);
+  document.getElementById('projTable').innerHTML=items.map((item,i)=>`
+    <tr>
+      <td><img src="${item.before}" alt="Before"></td>
+      <td><img src="${item.after}" alt="After"></td>
+      <td style="color:var(--white);">${item.desc}<br><small style="color:var(--wd);">${item.descAr||''}</small></td>
+      <td><button class="bti d" onclick="delProj(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></td>
+    </tr>`).join('');
+}
+function addProject(){
+  const b=v('ba_before'),a=v('ba_after'),d=v('ba_desc');
+  if(!b||!a||!d)return toast('Before image, after image, and description are required','err');
+  const items=get('beforeAfter',D_BA);items.push({before:b,after:a,desc:d,descAr:v('ba_descAr')});
+  set('beforeAfter',items);['ba_before','ba_after','ba_desc','ba_descAr'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderProj();toast('Project added!');
+}
+function delProj(i){if(!confirm('Delete?'))return;const items=get('beforeAfter',D_BA);items.splice(i,1);set('beforeAfter',items);renderProj();toast('Deleted');}
+
+/* ===== TESTIMONIALS ===== */
+function renderTesti(){
+  const items=get('testimonials',D_TEST);
+  const stars=n=>'★'.repeat(+n)+'☆'.repeat(5-+n);
+  document.getElementById('testiList').innerHTML=items.map((t,i)=>`
+    <div style="display:flex;gap:14px;background:#0d0d0d;border:1px solid var(--gb);padding:16px;margin-bottom:8px;align-items:flex-start;">
+      <div style="width:42px;height:42px;border-radius:50%;background:#1a1a1a;border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gold);flex-shrink:0;">${t.photo?`<img src="${t.photo}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;">`:t.name[0]}</div>
+      <div style="flex:1;">
+        <div style="font-weight:500;color:var(--white);font-size:13px;">${t.name} <span style="font-size:10px;color:var(--wd);">(${t.nameAr||''})</span></div>
+        <div style="font-size:10px;color:var(--wd);">${t.loc}</div>
+        <div style="color:var(--gold);font-size:11px;margin:4px 0;">${stars(t.rating)}</div>
+        <p style="font-size:12px;color:var(--wd);line-height:1.6;">"${t.review}"</p>
+        ${t.reviewAr?`<p style="font-size:12px;color:var(--wd);line-height:1.6;direction:rtl;">"${t.reviewAr}"</p>`:''}
+      </div>
+      <button class="bti d" onclick="delTesti(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>`).join('')||'<p style="color:var(--wd);font-size:12px;">No testimonials yet.</p>';
+}
+function addTestimonial(){
+  const name=v('t_name');if(!name)return toast('Name required','err');
+  const items=get('testimonials',D_TEST);
+  items.push({id:Date.now(),name,nameAr:v('t_nameAr'),loc:v('t_loc'),locAr:v('t_locAr'),rating:v('t_rating'),review:v('t_review'),reviewAr:v('t_reviewAr'),photo:v('t_photo')});
+  set('testimonials',items);['t_name','t_nameAr','t_loc','t_locAr','t_review','t_reviewAr','t_photo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderTesti();toast('Review added!');
+}
+function delTesti(i){const items=get('testimonials',D_TEST);items.splice(i,1);set('testimonials',items);renderTesti();toast('Removed');}
+
+/* ===== CONTACT ===== */
+function loadContact(){const d=get('contact',{});
+  ['p1','p2','wa','em','addr','hrs','map'].forEach(k=>{const el=document.getElementById('c_'+k);if(el)el.value=d['phone'+(k==='p1'?'1':k==='p2'?'2':'')]||d[k]||d[{wa:'whatsapp',em:'email',addr:'address',hrs:'hours',map:'mapUrl'}[k]]||d[k]||'';});
+}
+function saveContact(){
+  set('contact',{phone1:v('c_p1'),phone2:v('c_p2'),whatsapp:v('c_wa'),email:v('c_em'),address:v('c_addr'),hours:v('c_hrs'),mapUrl:v('c_map')});
+  toast('Contact saved!');
+}
+
+/* ===== SOCIAL ===== */
+function loadSocial(){const d=get('social',{});
+  ['fb','ig','wa','tk','yt','pt'].forEach(k=>{const el=document.getElementById('s_'+k);if(el)el.value=d[{fb:'facebook',ig:'instagram',wa:'whatsapp',tk:'tiktok',yt:'youtube',pt:'pinterest'}[k]]||'';});
+}
+function saveSocial(){
+  set('social',{facebook:v('s_fb'),instagram:v('s_ig'),whatsapp:v('s_wa'),tiktok:v('s_tk'),youtube:v('s_yt'),pinterest:v('s_pt')});
+  toast('Social links saved!');
+}
+
+/* ===== THEME ===== */
+function loadTheme(){const d=get('theme',{});
+  if(d.colorGold){document.getElementById('th_gold').value=d.colorGold;document.getElementById('th_goldH').value=d.colorGold;document.getElementById('sw_gold').style.background=d.colorGold;}
+  if(d.colorBlack){document.getElementById('th_black').value=d.colorBlack;document.getElementById('th_blackH').value=d.colorBlack;document.getElementById('sw_black').style.background=d.colorBlack;}
+  if(d.dispFont){document.getElementById('th_dispFont').value=d.dispFont;}
+  if(d.bodyFont){document.getElementById('th_bodyFont').value=d.bodyFont;}
+}
+function syncSwatch(name){const val=document.getElementById('th_'+name).value;document.getElementById('th_'+name+'H').value=val;document.getElementById('sw_'+name).style.background=val;}
+function syncColor(name){const val=document.getElementById('th_'+name+'H').value;if(/^#[0-9A-Fa-f]{6}$/.test(val)){document.getElementById('th_'+name).value=val;document.getElementById('sw_'+name).style.background=val;}}
+function applyPreset(gold,black){document.getElementById('th_gold').value=gold;document.getElementById('th_goldH').value=gold;document.getElementById('sw_gold').style.background=gold;document.getElementById('th_black').value=black;document.getElementById('th_blackH').value=black;document.getElementById('sw_black').style.background=black;toast('Preset applied — click Save Theme');}
+function saveTheme(){
+  set('theme',{colorGold:document.getElementById('th_gold').value,colorBlack:document.getElementById('th_black').value,dispFont:v('th_dispFont'),bodyFont:v('th_bodyFont')});
+  const b=get('branding',{});b.colorGold=document.getElementById('th_gold').value;b.colorBlack=document.getElementById('th_black').value;set('branding',b);
+  toast('Theme saved! Reload website to apply.');
+}
+
+/* ===== MEDIA ===== */
+function renderMedia(){
+  const med=get('media',[]);
+  document.getElementById('medCount').textContent=med.length+' images';
+  document.getElementById('medGrid').innerHTML=med.map((url,i)=>`
+    <div class="mi"><img src="${url}" alt="" loading="lazy">
+      <div class="mi-ov">
+        <button class="bti" onclick="navigator.clipboard.writeText('${url}').then(()=>toast('URL copied!'))" style="border-color:rgba(255,255,255,.3);color:#fff;" title="Copy URL"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+        <button class="bti d" onclick="delMed(${i})" title="Delete" style="border-color:rgba(255,255,255,.3);color:#e07070;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+    </div>`).join('')||'<p style="color:var(--wd);font-size:12px;">No media yet. Upload images above.</p>';
+}
+function addMediaUrl(){const url=v('med_url');if(!url)return toast('Enter URL','err');const med=get('media',[]);med.push(url);set('media',med);document.getElementById('med_url').value='';renderMedia();toast('Added!');}
+function uploadMedia(input){const files=Array.from(input.files);files.forEach(f=>{const r=new FileReader();r.onload=e=>{const med=get('media',[]);med.push(e.target.result);set('media',med);renderMedia();};r.readAsDataURL(f);});toast(files.length+' file(s) uploaded!');}
+function delMed(i){const med=get('media',[]);med.splice(i,1);set('media',med);renderMedia();toast('Removed');}
+
+/* ===== SEO ===== */
+function loadSEO(){const d=get('seo',{});['seo_title','seo_desc','seo_kw','seo_og','seo_ga'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=d[id.replace('seo_','')]||'';});seoPreview();}
+function seoPreview(){document.getElementById('seoTp').textContent=v('seo_title')||'Page Title';document.getElementById('seoDp').textContent=v('seo_desc')||'Meta description...';}
+function saveSEO(){set('seo',{title:v('seo_title'),desc:v('seo_desc'),keywords:v('seo_kw'),ogImage:v('seo_og'),gaId:v('seo_ga')});toast('SEO saved!');}
+
+/* ===== USERS ===== */
+function saveCredentials(){
+  const u=v('u_name'),cur=v('u_cur'),np=v('u_new'),nc=v('u_conf');
+  if(!u||!np)return toast('Fill all fields','err');
+  if(np!==nc)return toast('Passwords do not match','err');
+  const stored=JSON.parse(localStorage.getItem('sa_admin_creds')||'{}');
+  const validPass=stored.password||'admin123';
+  if(cur!==validPass)return toast('Current password incorrect','err');
+  localStorage.setItem('sa_admin_creds',JSON.stringify({username:u,password:np}));
+  toast('Credentials updated! Logging out...');
+  setTimeout(logout,1600);
+}
+function exportData(){
+  const keys=['branding','homepage','products','gallery','fabrics','testimonials','beforeAfter','contact','social','media','seo','theme'];
+  const data={};keys.forEach(k=>{data[k]=get(k,{});});
+  const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='samir-cms-backup.json';a.click();
+  toast('Exported!');
+}
+function importData(input){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);Object.keys(d).forEach(k=>set(k,d[k]));toast('Imported successfully!');renderDash();}catch{toast('Invalid JSON','err');}};
+  r.readAsText(f);
+}
+function resetAll(){['branding','homepage','products','gallery','fabrics','testimonials','beforeAfter','contact','social','media','seo','theme'].forEach(k=>localStorage.removeItem('sa_'+k));toast('Reset to defaults!');renderDash();}
+
+/* ===== LOGO UPLOAD ===== */
+function prevImg(input,prevId){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const el=document.getElementById(prevId);el.src=e.target.result;el.style.display='block';const d=get('branding',{});if(input.id==='b_logo')d.logoUrl=e.target.result;else d.faviconUrl=e.target.result;set('branding',d);};r.readAsDataURL(f);}
+
+/* ===== HELPERS ===== */
+function v(id){const el=document.getElementById(id);return el?el.value.trim():'';}
+function on(id){const el=document.getElementById(id);return el?el.classList.contains('on'):true;}
+
+/* ===== INIT ===== */
+renderDash();
+</script>
+</body>
+</html>

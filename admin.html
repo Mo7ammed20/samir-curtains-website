@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Samir Abdelazim CMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Raleway:wght@300;400;500;600&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C; --gold-light: #E8C97A; --black: #0A0A0A;
+    --black-soft: #111; --white: #F5F0E8; --white-dim: rgba(245,240,232,0.6);
+    --glass-border: rgba(201,168,76,0.2);
+    --font-en-display: 'Cormorant Garamond', serif;
+    --font-en-body: 'Raleway', sans-serif;
+    --font-ar: 'Tajawal', sans-serif;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--black); color: var(--white);
+    font-family: var(--font-en-body); min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; position: relative;
+  }
+  [lang="ar"] body, [lang="ar"] input, [lang="ar"] button, [lang="ar"] label, [lang="ar"] p, [lang="ar"] span {
+    font-family: var(--font-ar) !important;
+  }
+
+  /* ANIMATED BG */
+  .bg-wrap { position: fixed; inset: 0; pointer-events: none; }
+  .bg-grid {
+    position: absolute; inset: 0; opacity: 0.03;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(201,168,76,.5) 80px, rgba(201,168,76,.5) 81px),
+                      repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(201,168,76,.5) 80px, rgba(201,168,76,.5) 81px);
+  }
+  .bg-glow {
+    position: absolute; top: -30%; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%);
+    animation: pulse 6s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); } 50% { opacity: 1; transform: translateX(-50%) scale(1.1); } }
+
+  /* CARD */
+  .card-wrap { width: 100%; max-width: 420px; padding: 20px; z-index: 1; }
+  .card {
+    background: rgba(17,17,17,0.97); border: 1px solid var(--glass-border);
+    padding: 52px 44px 44px; position: relative; overflow: hidden;
+    animation: slideUp 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
+    opacity: 0; transform: translateY(24px);
+  }
+  @keyframes slideUp { to { opacity:1; transform: translateY(0); } }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* LOGO */
+  .logo { text-align: center; margin-bottom: 40px; }
+  .logo-crown { font-size: 32px; color: var(--gold); display: block; margin-bottom: 12px; animation: crownFloat 4s ease-in-out infinite; }
+  @keyframes crownFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+  .logo-name {
+    font-family: var(--font-en-display); font-size: 1.55rem; font-weight: 300;
+    color: var(--white); line-height: 1.1; display: block;
+  }
+  [lang="ar"] .logo-name { font-family: var(--font-ar) !important; font-size: 1.4rem; }
+  .logo-sub {
+    font-size: 8px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); display: block; margin-top: 6px; font-weight: 400;
+  }
+  [lang="ar"] .logo-sub { letter-spacing: 1px; font-family: var(--font-ar) !important; }
+
+  /* DIVIDER */
+  .divider {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 32px; color: var(--white-dim); font-size: 9px;
+    letter-spacing: 3px; text-transform: uppercase;
+  }
+  [lang="ar"] .divider { letter-spacing: 1px; font-family: var(--font-ar) !important; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+
+  /* FORM */
+  .fgrp { margin-bottom: 18px; position: relative; }
+  .flbl {
+    display: block; font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 7px; font-weight: 500;
+  }
+  [lang="ar"] .flbl { letter-spacing: 1px; font-size: 11px; font-family: var(--font-ar) !important; text-align: right; }
+  .finp {
+    width: 100%; padding: 13px 16px; background: #0a0a0a;
+    border: 1px solid var(--glass-border); color: var(--white);
+    font-family: var(--font-en-body); font-size: 14px; outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  [lang="ar"] .finp { font-family: var(--font-ar) !important; text-align: right; direction: rtl; }
+  .finp:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.06); }
+  .finp::placeholder { color: rgba(245,240,232,0.2); }
+
+  /* BUTTON */
+  .submit-btn {
+    width: 100%; padding: 14px; background: var(--gold);
+    border: none; color: var(--black); font-family: var(--font-en-body);
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    font-weight: 600; cursor: pointer; margin-top: 6px;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    position: relative; overflow: hidden;
+  }
+  [lang="ar"] .submit-btn { font-family: var(--font-ar) !important; letter-spacing: 1px; font-size: 13px; }
+  .submit-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  }
+  .submit-btn:hover { background: var(--gold-light); box-shadow: 0 6px 24px rgba(201,168,76,0.3); }
+  .submit-btn:active { transform: scale(0.99); }
+
+  /* ERROR */
+  .err-msg {
+    background: rgba(220,50,50,0.08); border: 1px solid rgba(220,50,50,0.25);
+    color: #e88; font-size: 12px; padding: 10px 14px; margin-top: 14px;
+    text-align: center; letter-spacing: 0.3px; display: none;
+  }
+  [lang="ar"] .err-msg { font-family: var(--font-ar) !important; font-size: 13px; }
+  .err-msg.show { display: block; animation: shake 0.4s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+
+  /* FOOTER */
+  .card-foot {
+    text-align: center; margin-top: 28px; padding-top: 22px;
+    border-top: 1px solid var(--glass-border);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  .card-foot a, .card-foot span { font-size: 11px; color: var(--white-dim); transition: color 0.3s; }
+  [lang="ar"] .card-foot a, [lang="ar"] .card-foot span { font-family: var(--font-ar) !important; font-size: 12px; }
+  .card-foot a:hover { color: var(--gold); }
+  .hint { font-size: 10px; color: rgba(201,168,76,0.4); letter-spacing: 0.5px; }
+  [lang="ar"] .hint { font-family: var(--font-ar) !important; font-size: 11px; letter-spacing: 0; }
+
+  /* LANG SWITCHER */
+  .lang-sw {
+    position: fixed; top: 20px; right: 20px; z-index: 100;
+    background: none; border: 1px solid var(--glass-border);
+    color: var(--white-dim); font-size: 10px; letter-spacing: 2px;
+    padding: 7px 14px; cursor: pointer; transition: all 0.3s;
+    font-family: var(--font-en-body);
+  }
+  .lang-sw:hover { border-color: var(--gold); color: var(--gold); }
+  [lang="ar"] .lang-sw { font-family: var(--font-ar) !important; letter-spacing: 0; }
+</style>
+</head>
+<body>
+<div class="bg-wrap"><div class="bg-grid"></div><div class="bg-glow"></div></div>
+
+<button class="lang-sw" id="langBtn" onclick="toggleLang()">عربي</button>
+
+<div class="card-wrap">
+  <div class="card">
+    <div class="logo">
+      <span class="logo-crown">♛</span>
+      <span class="logo-name" id="logoName">Samir Abdelazim</span>
+      <span class="logo-sub" id="logoSub">Admin Dashboard</span>
+    </div>
+
+    <div class="divider"><span id="dividerText">Secure Sign In</span></div>
+
+    <form onsubmit="doLogin(event)" autocomplete="on">
+      <div class="fgrp">
+        <label class="flbl" id="lblUser">Username</label>
+        <input type="text" class="finp" id="username" placeholder="admin" autocomplete="username">
+      </div>
+      <div class="fgrp">
+        <label class="flbl" id="lblPass">Password</label>
+        <input type="password" class="finp" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button type="submit" class="submit-btn" id="submitBtn">Enter Dashboard</button>
+      <div class="err-msg" id="errMsg">Invalid username or password. Please try again.</div>
+    </form>
+
+    <div class="card-foot">
+      <a href="index.html" id="backLink">← Back to Website</a>
+      <span class="hint" id="defaultHint">Default: admin / admin123</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── TRANSLATIONS ── */
+const T = {
+  en: {
+    logoSub: 'Admin Dashboard',
+    divider: 'Secure Sign In',
+    lblUser: 'Username',
+    lblPass: 'Password',
+    btn: 'Enter Dashboard',
+    err: 'Invalid username or password. Please try again.',
+    back: '← Back to Website',
+    hint: 'Default: admin / admin123',
+    langBtn: 'عربي',
+    userPH: 'admin',
+  },
+  ar: {
+    logoSub: 'لوحة التحكم',
+    divider: 'تسجيل الدخول الآمن',
+    lblUser: 'اسم المستخدم',
+    lblPass: 'كلمة المرور',
+    btn: 'دخول لوحة التحكم',
+    err: 'اسم المستخدم أو كلمة المرور غير صحيحة. حاول مجددًا.',
+    back: 'العودة للموقع ←',
+    hint: 'الافتراضي: admin / admin123',
+    langBtn: 'English',
+    userPH: 'admin',
+  }
+};
+
+let lang = localStorage.getItem('sa_lang') || 'en';
+
+function applyLang(l) {
+  lang = l;
+  localStorage.setItem('sa_lang', l);
+  const html = document.getElementById('htmlRoot');
+  html.lang = l;
+  html.dir = l === 'ar' ? 'rtl' : 'ltr';
+  const t = T[l];
+  document.getElementById('logoSub').textContent = t.logoSub;
+  document.getElementById('dividerText').textContent = t.divider;
+  document.getElementById('lblUser').textContent = t.lblUser;
+  document.getElementById('lblPass').textContent = t.lblPass;
+  document.getElementById('submitBtn').textContent = t.btn;
+  document.getElementById('errMsg').textContent = t.err;
+  document.getElementById('backLink').textContent = t.back;
+  document.getElementById('defaultHint').textContent = t.hint;
+  document.getElementById('langBtn').textContent = t.langBtn;
+  document.getElementById('username').placeholder = t.userPH;
+}
+
+function toggleLang() { applyLang(lang === 'en' ? 'ar' : 'en'); }
+
+/* ── AUTH ── */
+if (sessionStorage.getItem('sa_admin_auth') === 'true') {
+  window.location.href = 'admin-dashboard.html';
+}
+
+function doLogin(e) {
+  e.preventDefault();
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value;
+  const stored = JSON.parse(localStorage.getItem('sa_admin_creds') || '{}');
+  const validUser = stored.username || 'admin';
+  const validPass = stored.password || 'admin123';
+  if (u === validUser && p === validPass) {
+    sessionStorage.setItem('sa_admin_auth', 'true');
+    document.querySelector('.submit-btn').textContent = lang === 'ar' ? '✓ جاري التحميل...' : '✓ Loading...';
+    setTimeout(() => window.location.href = 'admin-dashboard.html', 400);
+  } else {
+    const err = document.getElementById('errMsg');
+    err.classList.remove('show');
+    void err.offsetWidth;
+    err.classList.add('show');
+    document.getElementById('password').value = '';
+    document.getElementById('password').focus();
+  }
+}
+
+/* ── INIT ── */
+applyLang(lang);
+</script>
+</body>
+</html>
