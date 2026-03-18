@@ -6,5 +6,12 @@
     "tiktok": "",
     "youtube": "",
     "pinterest": ""
+  },
+  "seo": {
+    "title": "",
+    "desc": "",
+    "keywords": "",
+    "ogImage": "",
+    "gaId": ""
   }
 }
